@@ -23,17 +23,16 @@ export async function GET(req: NextRequest) {
             )
         }
         
-        // Remove _id from response
         const { _id, ...userWithoutId } = user;
         
         return NextResponse.json(
             { user: userWithoutId },
             { status: 200 }
         )
-    } catch (error) {
+    } catch (error: any) {
         console.error('Profile fetch error:', error)
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: error.message || 'Internal server error' },
             { status: 500 }
         )
     }
@@ -52,16 +51,14 @@ export async function PUT(req: NextRequest) {
         
         const body = await req.json()
         
-        // Whitelist only safe fields
         const allowedUpdate: Record<string, any> = {
+            displayName: body.displayName,
             name: body.name,
             avatar: body.avatar,
             phone: body.phone,
             bio: body.bio,
-            displayName: body.displayName,
         }
         
-        // Remove undefined values
         Object.keys(allowedUpdate).forEach(key => {
             if (allowedUpdate[key] === undefined) {
                 delete allowedUpdate[key];
@@ -98,10 +95,10 @@ export async function PUT(req: NextRequest) {
             { user: userWithoutId },
             { status: 200 }
         )
-    } catch (error) {
+    } catch (error: any) {
         console.error('Profile update error:', error)
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: error.message || 'Internal server error' },
             { status: 500 }
         )
     }

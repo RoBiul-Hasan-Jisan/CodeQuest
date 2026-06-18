@@ -4,72 +4,32 @@ import { useState, useEffect } from 'react'
 import { auth } from '@/lib/firebase'
 import { APIClient } from '@/lib/api-client'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
-    const [debugInfo, setDebugInfo] = useState<any>(null)
     const router = useRouter()
 
     useEffect(() => {
-        console.log('Dashboard: Component mounted')
-        
-        // Check authentication state
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-            console.log('Dashboard: Auth state changed:', firebaseUser?.email || 'No user')
-            
             if (!firebaseUser) {
-                console.log('Dashboard: No user, redirecting to login')
                 router.push('/auth/login')
                 return
             }
 
-            console.log('Dashboard: User authenticated:', firebaseUser.email)
-            
             try {
-                // Get the token
-                const token = await firebaseUser.getIdToken()
-                console.log('Dashboard: Got token for user:', firebaseUser.email)
-                console.log('Dashboard: Token length:', token.length)
-                
-                // Test the token with our test endpoint
-                console.log('Dashboard: Testing token...')
-                const testResponse = await fetch('/api/test', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
-                const testData = await testResponse.json()
-                console.log('Dashboard: Test result:', testData)
-                setDebugInfo(testData)
-                
-                if (!testData.success) {
-                    console.log('Dashboard: Test failed:', testData.message)
-                    setError(testData.message || 'Authentication failed')
-                    setLoading(false)
-                    return
-                }
-                
-                // Fetch user profile from MongoDB
-                console.log('Dashboard: Fetching user profile...')
                 const data = await APIClient.getProfile()
-                console.log('Dashboard: Profile data:', data)
-                
                 setUser(data.user)
                 setLoading(false)
             } catch (err: any) {
-                console.error('Dashboard: Error:', err)
+                console.error('Error fetching profile:', err)
                 setError(err.message || 'Failed to load profile')
                 setLoading(false)
             }
         })
 
-        return () => {
-            console.log('Dashboard: Component unmounting')
-            unsubscribe()
-        }
+        return () => unsubscribe()
     }, [router])
 
     if (loading) {
@@ -86,16 +46,6 @@ export default function DashboardPage() {
                 <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20 max-w-md w-full">
                     <h2 className="text-2xl font-bold text-red-400 mb-4">Error</h2>
                     <p className="text-white mb-4">{error}</p>
-                    
-                    {debugInfo && (
-                        <div className="bg-white/5 rounded-lg p-4 mb-4">
-                            <p className="text-slate-400 text-sm">Debug Info:</p>
-                            <pre className="text-slate-300 text-xs mt-2 overflow-auto max-h-40">
-                                {JSON.stringify(debugInfo, null, 2)}
-                            </pre>
-                        </div>
-                    )}
-                    
                     <button 
                         onClick={() => {
                             auth.signOut()
@@ -119,7 +69,6 @@ export default function DashboardPage() {
                     </h1>
                     <button 
                         onClick={async () => {
-                            console.log('Dashboard: Signing out...')
                             await auth.signOut()
                             router.push('/auth/login')
                         }}
@@ -129,17 +78,6 @@ export default function DashboardPage() {
                     </button>
                 </div>
                 
-                {/* Debug Info */}
-                {debugInfo && (
-                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/20 mb-8">
-                        <h3 className="text-slate-300 text-sm mb-2">Auth Status:</h3>
-                        <pre className="text-green-400 text-xs overflow-auto">
-                            {JSON.stringify(debugInfo, null, 2)}
-                        </pre>
-                    </div>
-                )}
-                
-                {/* User Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                         <div className="text-slate-300 text-sm mb-2">Total XP</div>
