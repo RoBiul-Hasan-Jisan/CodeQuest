@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0f1020;
+  --bg-alt: #14152a;
+  --surface: #1a1c35;
+  --surface-hi: #22254a;
+  --border: #2c2e54;
+  --ink: #eceafc;
+  --ink-dim: #9b98c4;
+  --amber: #ffb454;
+  --violet: #8b7fff;
+  --teal: #5ce6c3;
+  --rose: #ff6b81;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-surface-hi: var(--surface-hi);
+  --color-border: var(--border);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-amber: var(--amber);
+  --color-violet: var(--violet);
+  --color-teal: var(--teal);
+  --color-rose: var(--rose);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-jbmono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(139,127,255,0.16), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(92,230,195,0.10), transparent 55%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--violet);
+  color: #0f1020;
+}
+
+.font-mono-tag {
+  font-family: var(--font-jbmono), ui-monospace, monospace;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise {
+  animation: rise 0.35s ease-out both;
+}
+
+input, textarea, select {
+  outline: none;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-hi); border-radius: 8px; }
