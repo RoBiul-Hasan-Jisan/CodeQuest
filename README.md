@@ -1,67 +1,130 @@
 # CodeQuest
 
-A full-stack study companion for coding students — tasks, LeetCode practice tracking,
-project deadlines, a progress heatmap, a Pomodoro focus timer, a course workspace
-(notes/resources/slides/tasks), friends, and direct messaging. Rebuilt in Next.js
-from the original JavaFX + Java HTTP server desktop app.
+A full-stack study companion for coding students, combining task management,
+LeetCode practice tracking, project deadlines, a progress heatmap, a Pomodoro
+focus timer, a course workspace, friends, and direct messaging — all in one app.
 
-Author: **Robiul Hasan Jisan**
+Originally built as a JavaFX + Java HTTP server desktop application, CodeQuest
+has been rebuilt from the ground up as a modern Next.js web app.
 
-## Stack
+**Author:** Robiul Hasan Jisan
 
-- **Next.js 15** (App Router, TypeScript, Tailwind CSS v4)
-- **Drizzle ORM** + **better-sqlite3** for storage (chosen over Prisma — no external
-  binary engine download required, so it works in fully offline/sandboxed environments too)
-- **jose** + **bcryptjs** for JWT auth in an httpOnly cookie
-- All backend logic lives in Next.js Route Handlers under `src/app/api/**`
+---
 
-## Getting started
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#project-structure)
+- [Data Model](#data-model)
+- [Design Notes: JavaFX → Next.js](#design-notes-javafx--nextjs)
+- [License](#license)
+
+---
+
+## Features
+
+| Module | Description |
+|---|---|
+| **Dashboard** | At-a-glance overview of tasks, deadlines, and study progress |
+| **Tasks** | Create, organize, and track coursework and personal to-dos |
+| **Calendar** | Visualize project deadlines and scheduled work over time |
+| **LeetCode Tracker** | Log solved problems and monitor practice consistency |
+| **Progress Heatmap** | GitHub-style activity heatmap of daily study effort |
+| **Pomodoro Timer** | Client-side focus timer for distraction-free study sessions |
+| **Course Workspace** | Per-course hub for notes, resources, slides, and tasks |
+| **Friends** | Send/accept friend requests to connect with classmates |
+| **Messages** | Direct messaging between friends |
+
+## Tech Stack
+
+- **[Next.js 15](https://nextjs.org/)** — App Router, TypeScript, Tailwind CSS v4
+- **[Drizzle ORM](https://orm.drizzle.team/)** + **better-sqlite3** — lightweight,
+  file-based storage with no external binary engine required, making the app easy
+  to run in fully offline or sandboxed environments
+- **[jose](https://github.com/panva/jose)** + **bcryptjs** — JWT-based authentication
+  stored in an `httpOnly` cookie
+- **Next.js Route Handlers** — all backend/API logic lives under `src/app/api/**`,
+  keeping the project a single deployable unit
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.18+ (or any version supported by Next.js 15)
+- npm
+
+### Installation
 
 ```bash
 npm install
 npm run dev
 ```
 
-Visit http://localhost:3000. Create an account on the signup page — there's no
-seed data.
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Environment variables (`.env`)
+There is no seed data — create an account from the signup page to get started.
 
-```
-DATABASE_URL="file:./dev.db"   # unused by the sqlite driver directly, kept for reference
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Unused directly by the sqlite driver; kept for reference/tooling compatibility
+DATABASE_URL="file:./dev.db"
+
+# Required in production — use a long, random, unique value
 JWT_SECRET="replace-with-a-long-random-string-in-production"
-DATA_DIR="/absolute/path/to/writable/dir"   # optional; defaults to /tmp/codequest, falls back to ./data
+
+# Optional. Defaults to /tmp/codequest, falling back to ./data if unwritable
+DATA_DIR="/absolute/path/to/writable/dir"
 ```
 
-Set a strong, unique `JWT_SECRET` before deploying.
+>  **Security note:** Always set a strong, unique `JWT_SECRET` before deploying
+> to any environment beyond local development.
 
-## Project structure
+## Project Structure
 
 ```
 src/
-  app/
-    (app)/            # authenticated app shell: dashboard, tasks, calendar,
-                       # leetcode, progress, pomodoro, courses, friends, messages
-    api/               # REST-style route handlers (one folder per resource)
-    login/ signup/     # auth pages
-    page.tsx           # public landing page
-  components/          # shared UI primitives + AppShell sidebar
-  db/                  # Drizzle schema + sqlite connection/bootstrap
-  lib/                 # auth helpers, api client, shared types
+├── app/
+│   ├── (app)/          # Authenticated app shell — dashboard, tasks, calendar,
+│   │                   # leetcode, progress, pomodoro, courses, friends, messages
+│   ├── api/             # REST-style route handlers, one folder per resource
+│   ├── login/           # Auth pages
+│   ├── signup/
+│   └── page.tsx         # Public landing page
+├── components/          # Shared UI primitives and the AppShell sidebar
+├── db/                  # Drizzle schema and SQLite connection/bootstrap logic
+└── lib/                 # Auth helpers, API client, shared types
 ```
 
-## Data model
+## Data Model
 
-SQLite tables (see `src/db/schema.ts`): `users`, `tasks`, `projects`, `progress`,
-`leetcode_problems`, `friendships`, `messages`, `courses`, `course_items`.
-Tables are created automatically on first run (no migration step needed for local dev).
+The app is backed by SQLite tables defined in `src/db/schema.ts`:
 
-## Notes on the conversion
+`users` · `tasks` · `projects` · `progress` · `leetcode_problems` ·
+`friendships` · `messages` · `courses` · `course_items`
 
-- Friend/message relationships are keyed by **username** (matching the original
-  Java app's model) rather than foreign-key IDs, to keep the friend-request and
-  DM logic a close match to the source behavior.
-- The Pomodoro timer is fully client-side (no persistence), matching the original's
-  simple session countdown.
-- Course items (notes/resources/slides/tasks) share one `course_items` table
-  distinguished by a `type` column, mirroring the original's four-panel course workspace.
+Tables are created automatically on first run — no migration step is required
+for local development.
+
+## Design Notes: JavaFX → Next.js
+
+A few implementation choices preserve behavior from the original desktop app:
+
+- **Username-keyed relationships** — Friend and message relationships are keyed
+  by **username** rather than foreign-key IDs, matching the original Java
+  application's model and keeping the friend-request and DM logic a close
+  match to the source behavior.
+- **Client-only Pomodoro timer** — The focus timer has no persistence layer,
+  mirroring the original's simple session countdown.
+- **Unified course items table** — Notes, resources, slides, and tasks within a
+  course share a single `course_items` table distinguished by a `type` column,
+  mirroring the original's four-panel course workspace.
+- **Drizzle over Prisma** — Drizzle + better-sqlite3 was chosen specifically
+  because it requires no external binary engine download, so the app runs
+  reliably in fully offline or sandboxed environments.
+
