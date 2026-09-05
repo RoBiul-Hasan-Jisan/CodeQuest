@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm rise">
         <Link href="/" className="flex items-center gap-2 mb-8 justify-center">
-          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet to-teal flex items-center justify-center text-bg font-bold text-sm">
+          <span className="w-8 h-8 rounded-lg bg-linear-to-br from-violet to-teal flex items-center justify-center text-bg font-bold text-sm">
             CQ
           </span>
           <span className="font-semibold text-lg tracking-tight">CodeQuest</span>
